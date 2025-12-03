@@ -4,7 +4,8 @@
 	import { Progress } from '@skeletonlabs/skeleton-svelte';
 	import { onMount, onDestroy } from 'svelte';
 
-	import { chapters } from '../../../Chapters';
+	import { book_1_air } from '$lib/data/books/1/index';
+	const chapters = book_1_air.chapters;
 	import WisdomResultModal from '$lib/modals/WisdomResultModal.svelte';
 	import { parseInstructions } from '$lib/utils/quest';
 
@@ -17,7 +18,7 @@
 	import MathInput from '$lib/Tasks/Quests/MathInput.svelte';
 	import BooleanBtn from '$lib/Tasks/Quests/BooleanBtn.svelte';
 
-	const { qId, sId, cId } = page.params;
+	const { qId, sId, cId } = page.params as { qId: string; sId: string; cId: string };
 	const quest = chapters[Number(cId)].sections[Number(sId)].quests[Number(qId)];
 
 	let helpText = quest.tips ? parseInstructions(quest.tips) : parseInstructions(quest.instructions);

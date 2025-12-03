@@ -1,3 +1,41 @@
+import type { RequestEvent } from '@sveltejs/kit';
+
+// Minimal, safe auth stubs so server hooks can import them while auth is disabled.
+export const sessionCookieName = 'auth-session';
+
+export async function validateSessionToken(token: string): Promise<{ session: { expiresAt: Date } | null; user: any | null }> {
+  // Minimal stubbed implementation while auth is disabled
+  // Return null session/user so hooks can proceed without blocking.
+  return { session: null, user: null } as { session: { expiresAt: Date } | null; user: any | null };
+}
+
+export async function invalidateSession(sessionId: string) {
+  // noop in stubbed implementation
+}
+
+export function setSessionTokenCookie(event: RequestEvent, token: string, expiresAt: Date) {
+  // set cookie if cookies API available
+  try {
+    event.cookies.set(sessionCookieName, token, {
+      expires: expiresAt,
+      path: '/'
+    });
+  } catch (e) {
+    // ignore in serverless environments without cookie support
+  }
+}
+
+export function deleteSessionTokenCookie(event: RequestEvent) {
+  try {
+    event.cookies.delete(sessionCookieName, {
+      path: '/'
+    });
+  } catch (e) {
+    // noop
+  }
+}
+
+export type SessionValidationResult = { session: any | null; user: any | null };
 // import type { RequestEvent } from '@sveltejs/kit';
 // import { eq } from 'drizzle-orm';
 // import { sha256 } from '@oslojs/crypto/sha2';

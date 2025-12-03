@@ -1,4 +1,6 @@
 import { pauseTimer, startTimer, stopTimer, resetTimer, resetPartialTime } from '$lib/clock';
+import { feedback, type ThemeOption } from '$lib/game/data/data';
+import { shuffleArray } from '$lib/utils/shuffle';
 
 
 
@@ -7,7 +9,8 @@ import { pauseTimer, startTimer, stopTimer, resetTimer, resetPartialTime } from 
 let gameName = 'SpeedyOps!';
 let gameInstructions = 'Antes que o tempo acabe, você deve encontrar o resultado da expressão.';
 // Declaração da variável 'audioMissElement' com o tipo do elemento HTMLAudioElement
-let audioMissElement: HTMLAudioElement, audioHitElement: HTMLAudioElement;
+let audioMissElement: HTMLAudioElement = new Audio();
+let audioHitElement: HTMLAudioElement = new Audio();
 
 /* Game Settings */
 let theme: ThemeOption = /* 'dota2'; */ 'alirio';
@@ -25,6 +28,19 @@ let totalBarTime = initialTotalTime; // Tempo total do jogo (1 minuto em milisse
 let progressBarColor: string = 'bg-green-500'; // Cor inicial da barra
 let delay = 500;
 let muted = false;
+
+// Operation type used by the game
+export type Operation = { expression: string; result: number; shouldRound: boolean };
+let operation: Operation | null = null;
+
+// Set audio sources (elements initialized earlier)
+audioHitElement.src = hitAudioSrc;
+audioMissElement.src = missAudioSrc;
+
+// Utility: random integer
+function getRandomInt(min: number, max: number): number {
+	return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 /* Game Variables */
 let message: string,
@@ -155,7 +171,7 @@ function generateWrongOptions(correctOption: string): number[] {
 	const options: number[] = [];
 	while (options.length < 2) {
 		let wrongOption: string;
-		if (operation.shouldRound) {
+		if (operation?.shouldRound) {
 			// Arredonda as opções incorretas apenas se a operação for divisão
 			wrongOption = getRandomInt(1, 100).toFixed(3);
 		} else {
@@ -175,11 +191,13 @@ function generateWrongOptions(correctOption: string): number[] {
 }
 
 function generateOptions(): number[] {
-	const correctOption = operation.shouldRound
-		? operation.result.toFixed(3)
-		: operation.result.toString();
+	const correctOption = operation
+		? operation.shouldRound
+			? operation.result.toFixed(3)
+			: operation.result.toString()
+		: '0';
 	const wrongOptions = generateWrongOptions(correctOption);
-	const shuffledOptions = shuffleArray([parseFloat(correctOption), ...wrongOptions]);
+	const shuffledOptions = shuffleArray([parseFloat(correctOption || '0'), ...wrongOptions]);
 	return shuffledOptions;
 }
 
@@ -207,9 +225,9 @@ function hdlVolumeChanged(e: CustomEvent<any>): void {
 	audioHitElement.volume = e.detail.audioVolume; // Aplica o volume ao áudio de "audioHitElement"
 }
 
-let playEndGameMusic: () => void;
-let stopAllMusic: () => void;
-let playBackgroundMusic: () => void;
+let playEndGameMusic: () => void = () => {};
+let stopAllMusic: () => void = () => {};
+let playBackgroundMusic: () => void = () => {};
 
 // Assinar o store para obter a função
 // $: musicStore.subscribe((actions) => {
@@ -222,7 +240,7 @@ function handleOptionClick(option: number) {
 	//console.log('User input:', userInput);
 	//console.log('Selected option:', option);
 
-	if (option === operation.result) {
+	if (option === operation?.result) {
 		srcImg = hitImageSrc;
 		audioMissElement.pause();
 		if (muted === false) {

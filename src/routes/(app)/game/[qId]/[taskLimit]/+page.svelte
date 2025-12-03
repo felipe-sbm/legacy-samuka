@@ -24,7 +24,7 @@
 
 	const questData = book_1_air;
 
-	const { qId, taskLimit, studentId } = page.params;
+	const { qId, taskLimit, studentId } = page.params as { qId: string; taskLimit?: string; studentId?: string };
 
 	let { data, helpText } = $props<{ helpText?: string; data: PageProps }>();
 
@@ -40,7 +40,7 @@
 
 	const questType = quest.questType;
 
-	const maxQuests = parseInt(taskLimit);
+	const maxQuests = parseInt(taskLimit ?? '0');
 
 	const questComponents: any[] = $state(
 		Array.from({ length: maxQuests }, (_, i) => {
@@ -108,13 +108,13 @@
 			bookId: 'efe7db13-4f57-4b08-bfa9-a33e8106aa9d' // Using the book ID from data
 		};
 
-		const volume = parseInt(taskLimit);
+		const volume = parseInt(taskLimit ?? '0');
 		const duration = endedAt.getTime() - startedAt.getTime();
 		const speed = (volume * 1000) / duration;
 
 		const questAttempt: QuestAttempt = {
 			id: crypto.randomUUID(),
-			studentId, // Add appropriate student ID
+				studentId: studentId ?? 'unknown', // Add appropriate student ID
 			questId: qId, // Using the questId from params
 			grade: status,
 			hits: correctCount,

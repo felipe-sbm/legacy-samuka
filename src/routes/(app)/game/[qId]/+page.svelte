@@ -16,7 +16,7 @@
 	const questData = book_1_air;
 
 	const pathname = page.url.pathname;
-	const { qId } = page.params;
+	const { qId } = page.params as { qId: string };
 
 	// const questStatus = data.questStatus.find((q: { id: string }) => q.id === questStatusId);
 	const quest = findQuest(questData, qId);

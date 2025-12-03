@@ -31,4 +31,4 @@
 		>Register</button
 	>
 </form>
-<p style="color: red">{form?.message ?? ''}</p>
+<p style="color: red">{(form as any)?.message ?? ''}</p>

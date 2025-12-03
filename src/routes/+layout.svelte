@@ -22,7 +22,7 @@
 	<button
 		aria-label="Toggle dark mode."
 		class="btn-icon hover:preset-tonal fixed top-10 right-0 z-10 m-4 mr-1 md:top-0 md:mt-1 md:mr-4"
-		class:mt-0={page.url.pathname === '/demo'}
+		class:mt-0={String(page.url.pathname) === '/demo'}
 		class:md:mt-4={isWisdomPath}
 		title="Toggle dark mode."
 		data-lightswitch=""
